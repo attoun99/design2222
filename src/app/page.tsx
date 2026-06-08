@@ -5,7 +5,6 @@ import { Services } from "@/components/Services";
 import { Catalogue } from "@/components/Catalogue";
 import { Why } from "@/components/Why";
 import { Factory } from "@/components/Factory";
-import { Founders } from "@/components/Founders";
 import { ContactCTA } from "@/components/ContactCTA";
 
 export default function Home() {
@@ -18,7 +17,6 @@ export default function Home() {
       <Catalogue />
       <Why />
       <Factory />
-      <Founders />
       <ContactCTA />
     </>
   );

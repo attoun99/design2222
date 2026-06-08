@@ -160,57 +160,6 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.28) {
   return ref;
 }
 
-/** 3D pointer-tilt for the founder portraits: rotation + glare lerped via rAF. */
-export function useTilt<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (prefersReducedMotion() || !hoverCapable()) return;
-
-    const MAX = 11;
-    let raf: number | null = null;
-    let tx = 0, ty = 0, cx = 0, cy = 0;
-
-    const render = () => {
-      cx += (tx - cx) * 0.14;
-      cy += (ty - cy) * 0.14;
-      el.style.setProperty("--rx", (-cy * MAX).toFixed(2) + "deg");
-      el.style.setProperty("--ry", (cx * MAX).toFixed(2) + "deg");
-      el.style.setProperty("--gx", (50 + cx * 50).toFixed(1) + "%");
-      el.style.setProperty("--gy", (50 + cy * 50).toFixed(1) + "%");
-      if (Math.abs(tx - cx) > 0.001 || Math.abs(ty - cy) > 0.001) {
-        raf = requestAnimationFrame(render);
-      } else {
-        raf = null;
-      }
-    };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(render); };
-
-    const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      tx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      ty = ((e.clientY - r.top) / r.height) * 2 - 1;
-      kick();
-    };
-    const onEnter = () => el.classList.add("tilting");
-    const onLeave = () => { tx = 0; ty = 0; el.classList.remove("tilting"); kick(); };
-
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerenter", onEnter);
-    el.addEventListener("pointerleave", onLeave);
-    return () => {
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerenter", onEnter);
-      el.removeEventListener("pointerleave", onLeave);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  return ref;
-}
-
 type Fiber = {
   id: number;
   size: number;
