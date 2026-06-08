@@ -16,7 +16,7 @@ function hoverCapable() {
  * the visible end-state is the base style; the hidden start only applies
  * once JS confirms motion is allowed (handled via the `js-anim` class on <html>).
  */
-export function useInView<T extends HTMLElement>(threshold = 0.12) {
+export function useInView<T extends HTMLElement>(threshold = 0.12, observeParent = false) {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
 
@@ -27,6 +27,10 @@ export function useInView<T extends HTMLElement>(threshold = 0.12) {
       setInView(true);
       return;
     }
+    // Clip-revealed elements are clipped to zero area in their hidden state, and
+    // browsers compute intersection post-clip — so observing the element itself
+    // would never report it as visible. Watch its (unclipped) parent instead.
+    const target = (observeParent && el.parentElement) || el;
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -38,9 +42,9 @@ export function useInView<T extends HTMLElement>(threshold = 0.12) {
       },
       { threshold, rootMargin: "0px 0px -8% 0px" }
     );
-    io.observe(el);
+    io.observe(target);
     return () => io.disconnect();
-  }, [threshold]);
+  }, [threshold, observeParent]);
 
   return { ref, inView };
 }

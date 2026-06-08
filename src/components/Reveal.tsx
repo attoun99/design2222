@@ -15,7 +15,7 @@ type RevealProps = {
 
 /** Wraps content so it blurs/rises (or clip-reveals) into place when scrolled into view. */
 export function Reveal({ as: Tag = "div", children, className = "", variant = "fade", delay = 0, style, ...rest }: RevealProps) {
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView(0.12, variant === "clip");
   const cls = [variant === "clip" ? "clip-reveal" : "reveal-t", inView ? "in" : "", className].filter(Boolean).join(" ");
   return (
     <Tag
